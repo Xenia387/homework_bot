@@ -96,7 +96,10 @@ def send_message(bot, message):
 
 
 def get_api_answer(timestamp):
-    """Делает запрос к эндпроинту, возвращает ответ api в формате json"""
+    """
+    Делает запрос к эндпроинту, возвращает ответ api
+    и переводит его в формат json
+    """
     timestamp = int(time.time())
 
     try:
