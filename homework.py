@@ -75,15 +75,15 @@ formatter = logging.Formatter(
 handler .setFormatter(formatter)
 
 
-def check_tokens() -> bool:
-    """Проверяет доступность переменных окружения"""
+def check_tokens():
+    """Проверяет доступность переменных окружения."""
     if not all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]):
         logging.critical('Токены не были найдены')
         sys.exit()
 
 
 def send_message(bot, message):
-    """Отправляет сообщения в чат"""
+    """Отправляет сообщения в чат."""
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
         logger.debug(f'{message}')
@@ -92,22 +92,21 @@ def send_message(bot, message):
         logging.error(SendMessageError)
         raise Exception(
             f'При отправке сообщения "{message}" произошла ошибка: "{error}"'
-            )
+        )
 
 
 def get_api_answer(timestamp):
-    """
-    Делает запрос к эндпроинту, возвращает ответ api
-    и переводит его в формат json
+    """Делает запрос к эндпроинту, возвращает ответ api.
+    и переводит его в формат json.
     """
     timestamp = int(time.time())
 
     try:
-        request_status = (requests.get(
-                ENDPOINT,
-                headers=HEADERS,
-                params={'form_data': timestamp}
-            ))
+        request_status = requests.get(
+            ENDPOINT,
+            headers=HEADERS,
+            params={'form_data': timestamp}
+        )
 
         if request_status.status_code != HTTPStatus.OK:
             raise HTTPError('Эндпоинт не доступен')
@@ -119,10 +118,10 @@ def get_api_answer(timestamp):
 
 
 def check_response(response):
-    """Проверяет полученные данных на корректность"""
+    """Проверяет полученные данных на корректность."""
     if (
-        not isinstance(response, dict) or
-        not isinstance(response.get('homeworks'), list)
+        not isinstance(response, dict)
+        or not isinstance(response.get('homeworks'), list)
     ):
         logger.error(TypeError)
         raise TypeError('Тип данных не соответствует ожидаемому')
@@ -135,7 +134,7 @@ def check_response(response):
 
 
 def parse_status(homework):
-    """Извлекает информацию о статусе работы"""
+    """Извлекает информацию о статусе работы."""
     homework_status = homework.get('status')
     homework_name = homework.get('homework_name')
 
@@ -153,7 +152,7 @@ def parse_status(homework):
 
 # тесты-то пройдены но кажется тут всё ужасно недоработано
 def main():
-    """Основная логика работы бота"""
+    """Основная логика работы бота."""
     check_tokens()
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     send_message(
