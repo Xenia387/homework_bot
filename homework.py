@@ -1,17 +1,18 @@
 import os
+import logging
 import sys
 import time
-import logging
+
+
 from http import HTTPStatus
 import requests
-
 import telegram
-
 from dotenv import load_dotenv
 
 from exceptions import (
     SendMessageError,
     HTTPError,
+    RequestError,
 )
 
 load_dotenv()
@@ -19,7 +20,6 @@ load_dotenv()
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
-# secret_token = os.getenv(TOKEN)
 
 RETRY_PERIOD = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
@@ -35,36 +35,6 @@ HOMEWORK_VERDICTS = {
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
 }
 
-{
-    "homework": [
-        {
-            "id": 123,
-            "status": "approved",
-            "homework_name": "username__hw_oop.zip",
-            "reviewer_comment": "Всё нравится",
-            "date_updated": "2020-02-11T14:40:57Z",
-            "lesson_name": "Итоговый проект"
-        },
-        {
-            "id": 124,
-            "status": "rejected",
-            "homework_name": "username__hw_python_oop.zip",
-            "reviewer_comment": "Имеются некоторые замечания",
-            "date_updated": "2020-02-13T16:42:47Z",
-            "lesson_name": "Итоговый проект"
-        },
-        {
-            "id": 125,
-            "status": "reviewed",
-            "homework_name": "username__hw_python_oop.zip",
-            "reviewer_comment": "Работа проверяется",
-            "date_updated": "2020-02-13T16:42:47Z",
-            "lesson_name": "Итоговый проект"
-        }
-    ],
-    "current_date": 1581604970
-}
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 handler = logging.StreamHandler(stream=sys.stdout)
@@ -72,14 +42,22 @@ logger.addHandler(handler)
 formatter = logging.Formatter(
     '%(asctime)s - %(levelname)s - %(message)s'
 )
-handler .setFormatter(formatter)
+handler.setFormatter(formatter)
+
+
+TOKENS = {
+    'PRACTICUM_TOKEN': PRACTICUM_TOKEN,
+    'TELEGRAM_TOKEN': TELEGRAM_TOKEN,
+    'TELEGRAM_CHAT_ID': TELEGRAM_CHAT_ID,
+}
 
 
 def check_tokens():
-    """Проверяет доступность переменных окружения."""
-    if not all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]):
-        logging.critical('Токены не были найдены')
-        sys.exit()
+    """Проверяет доступность токенов."""
+    for token in TOKENS:
+        if globals()[token] is None:
+            logging.critical(f'Токен "{token}" не найден')
+            sys.exit(1)
 
 
 def send_message(bot, message):
@@ -90,7 +68,7 @@ def send_message(bot, message):
 
     except Exception as error:
         logging.error(SendMessageError)
-        raise Exception(
+        raise SendMessageError(
             f'При отправке сообщения "{message}" произошла ошибка: "{error}"'
         )
 
@@ -99,8 +77,6 @@ def get_api_answer(timestamp):
     """Делает запрос к эндпроинту, возвращает ответ api.
     и переводит его в формат json.
     """
-    timestamp = int(time.time())
-
     try:
         request_status = requests.get(
             ENDPOINT,
@@ -109,10 +85,12 @@ def get_api_answer(timestamp):
         )
 
         if request_status.status_code != HTTPStatus.OK:
-            raise HTTPError('Эндпоинт не доступен')
+            raise HTTPError(
+                f'Эндпоинт "{ENDPOINT}" не доступен'
+            )
 
-    except requests.RequestEcxeption:
-        logger.error('Сбой при запросе')
+    except Exception:
+        raise RequestError('Сбой при запросе')
 
     return request_status.json()
 
@@ -150,7 +128,6 @@ def parse_status(homework):
     return (f'Изменился статус проверки работы "{homework_name}". {verdict}')
 
 
-# тесты-то пройдены но кажется тут всё ужасно недоработано
 def main():
     """Основная логика работы бота."""
     check_tokens()
