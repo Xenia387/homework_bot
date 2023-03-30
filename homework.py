@@ -3,8 +3,8 @@ import logging
 import sys
 import time
 
-
 from http import HTTPStatus
+
 import requests
 import telegram
 from dotenv import load_dotenv
@@ -26,9 +26,6 @@ ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
 
-chat_id = TELEGRAM_CHAT_ID
-
-
 HOMEWORK_VERDICTS = {
     'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
     'reviewing': 'Работа взята на проверку ревьюером.',
@@ -47,7 +44,7 @@ handler.setFormatter(formatter)
 
 TOKENS = {
     'PRACTICUM_TOKEN': PRACTICUM_TOKEN,
-    'TELEGRAM_TOKEN': TELEGRAM_TOKEN,
+    'TELEGRAM_TOKEN': PRACTICUM_TOKEN,
     'TELEGRAM_CHAT_ID': TELEGRAM_CHAT_ID,
 }
 
@@ -55,22 +52,26 @@ TOKENS = {
 def check_tokens():
     """Проверяет доступность токенов."""
     for token in TOKENS:
+        token_list = []
         if globals()[token] is None:
-            logging.critical(f'Токен "{token}" не найден')
-            sys.exit(1)
+            for i in token:
+                token_list = [{i}]
+                logging.critical(f'Токены "{token_list}" не найдены')
+                sys.exit(1)
 
 
 def send_message(bot, message):
     """Отправляет сообщения в чат."""
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
-        logger.debug(f'{message}')
-
     except Exception as error:
         logging.error(SendMessageError)
         raise SendMessageError(
-            f'При отправке сообщения "{message}" произошла ошибка: "{error}"'
+            f'При отправке сообщения "{message}" к {TELEGRAM_CHAT_ID} '
+            f'произошла ошибка: "{error}"'
         )
+    else:
+        logger.debug(f'Сообщение "{message}" к {TELEGRAM_CHAT_ID} отправлено')
 
 
 def get_api_answer(timestamp):
@@ -81,7 +82,7 @@ def get_api_answer(timestamp):
         request_status = requests.get(
             ENDPOINT,
             headers=HEADERS,
-            params={'form_data': timestamp}
+            params={'from_date': timestamp}
         )
 
         if request_status.status_code != HTTPStatus.OK:
@@ -89,7 +90,7 @@ def get_api_answer(timestamp):
                 f'Эндпоинт "{ENDPOINT}" не доступен'
             )
 
-    except Exception:
+    except requests.RequestException:
         raise RequestError('Сбой при запросе')
 
     return request_status.json()
