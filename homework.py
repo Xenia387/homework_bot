@@ -2,7 +2,6 @@ import os
 import logging
 import sys
 import time
-
 from http import HTTPStatus
 
 import requests
@@ -51,8 +50,8 @@ TOKENS = {
 
 def check_tokens():
     """Проверяет доступность токенов."""
+    token_list = []
     for token in TOKENS:
-        token_list = []
         if globals()[token] is None:
             for i in token:
                 token_list = [{i}]
