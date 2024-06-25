@@ -20,6 +20,39 @@
 - Логировать свою работу и сообщать вам о важных проблемах сообщением в Telegram
 - Каждое сообщение в журнале логов должно состоять как минимум из даты и времени события, уровня важности события, описания события.
 
+# Запуск проекта
+
+- Клонируйте репозиторий с проектом на свой компьютер
+```bash
+git clone git@github.com:Xenia387/homework_bot.git
+```
+
+- Установите и активируйте виртуальное окружение
+
+```
+python3 -m venv env
+```
+
+```
+source env/bin/activate
+```
+
+  или
+
+```
+python -m venv env
+```
+
+```
+source venv/Scripts/activate
+```
+
+- Установите зависимости из файла requirements.txt
+
+```bash
+pip install -r requirements.txt
+```
+
 Автор проекта: Анисимова Ксения
 - email: anis.xenia@yandex.ru
 - telegram: @Ksenia_An_mova
