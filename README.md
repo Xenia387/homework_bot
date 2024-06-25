@@ -35,6 +35,10 @@
 git clone git@github.com:Xenia387/homework_bot.git
 ```
 
+```
+cd homework_bot
+```
+
 - Установите и активируйте виртуальное окружение
 
 ```
