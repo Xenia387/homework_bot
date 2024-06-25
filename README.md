@@ -7,6 +7,12 @@
 - Telegram API
 - Yandex.Praktikum API
 - python-telegram-bot
+- flake8==3.9.2
+- flake8-docstrings==1.6.0
+- pytest==6.2.5
+- python-dotenv==0.19.0
+- python-telegram-bot==13.7
+- requests==2.26.0
 
 ## Что должен делать бот:
 - Раз в 10 минут опрашивать API сервиса Практикум.Домашка и проверять статус отправленной на ревью домашней работы
