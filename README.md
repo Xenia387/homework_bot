@@ -3,7 +3,7 @@
 Бот-ассистент - Telegram-бота, который обращается к API сервиса Практикум.Домашка и узнаваёт статус вашей домашней работы.
 
 ## Стек технологий
-- Python3
+- Python
 - Telegram API
 - Yandex.Praktikum API
 - python-telegram-bot
