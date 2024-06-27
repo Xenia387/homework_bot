@@ -42,7 +42,7 @@ cd homework_bot
 - Установите и активируйте виртуальное окружение
 
 ```
-python3 -m venv env
+python3 -m venv venv
 ```
 
 ```
