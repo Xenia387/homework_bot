@@ -52,7 +52,7 @@ source venv/bin/activate
   или
 
 ```
-python -m venv env
+python -m venv venv
 ```
 
 ```
